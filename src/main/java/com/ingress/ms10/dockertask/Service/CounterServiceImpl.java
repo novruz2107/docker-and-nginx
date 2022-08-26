@@ -1,6 +1,7 @@
 package com.ingress.ms10.dockertask.Service;
 
 import com.ingress.ms10.dockertask.IRepository.CounterRepository;
+import com.ingress.ms10.dockertask.annotation.LogExecutionTime;
 import com.ingress.ms10.dockertask.domain.Counter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ public class CounterServiceImpl implements CounterService {
     private final CounterRepository counterRepository;
 
     @Override
+    @LogExecutionTime
     public Counter saveAndGetCounter() {
         Counter counter = counterRepository.findFirstByOrderByIdDesc();
         if (counter == null) {

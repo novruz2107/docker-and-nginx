@@ -1,12 +1,17 @@
+import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+import com.bmuschko.gradle.docker.tasks.image.Dockerfile
+
 plugins {
 	id 'org.springframework.boot' version '2.7.0'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'com.bmuschko.docker-remote-api' version "$dockerVersion"
 	id 'java'
 }
 
 group = 'com.ingress.ms10'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
+
 
 configurations {
 	compileOnly {
@@ -27,6 +32,26 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
+apply plugin: 'com.bmuschko.docker-remote-api'
+
+task dockerFile(type: Dockerfile, dependsOn: assemble){
+	destFile.set(project.file('Dockerfile'))
+	from "alpine:3.14"
+	runCommand 'apk add --no-cache openjdk11'
+	copyFile "build/libs/docker-task-0.0.1-SNAPSHOT.jar", "/app/"
+	workingDir '/app'
+	defaultCommand 'java -jar /app/docker-task-0.0.1-SNAPSHOT.jar'
+}
+
+task dockerBuild(type: DockerBuildImage){
+	inputDir.set(file("$projectDir/."))
+	images.add("novruz2107/docker-test")
+}
+
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+task novruz{
+	print "novruz"
 }
